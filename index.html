@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Flyer Factory — AI Prompt Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Instrument+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #06060a;
+  --s1: #0d0d13;
+  --s2: #13131b;
+  --s3: #1a1a24;
+  --s4: #22222e;
+  --border: rgba(255,255,255,0.06);
+  --border2: rgba(255,255,255,0.11);
+  --border3: rgba(255,255,255,0.18);
+  --accent: #7effd4;
+  --accent-dim: rgba(126,255,212,0.08);
+  --accent-border: rgba(126,255,212,0.25);
+  --amber: #ffb347;
+  --amber-dim: rgba(255,179,71,0.08);
+  --amber-border: rgba(255,179,71,0.25);
+  --blue: #7eb8ff;
+  --blue-dim: rgba(126,184,255,0.08);
+  --blue-border: rgba(126,184,255,0.25);
+  --red: #ff7e7e;
+  --text: #ededf2;
+  --muted: #5a5a6e;
+  --muted2: #8888a0;
+  --r: 12px;
+  --rsm: 7px;
+  --rxs: 5px;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Instrument Sans',sans-serif;
+  font-size:14px;
+  line-height:1.5;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* Ambient */
+.ambient{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.ambient-orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:0.06;}
+.orb1{width:700px;height:700px;background:var(--accent);top:-300px;left:-200px;animation:orb 20s ease-in-out infinite alternate;}
+.orb2{width:500px;height:500px;background:#a07eff;bottom:-200px;right:-100px;animation:orb 16s 4s ease-in-out infinite alternate;}
+.orb3{width:400px;height:400px;background:var(--amber);top:50%;left:50%;transform:translate(-50%,-50%);animation:orb 12s 2s ease-in-out infinite alternate;}
+@keyframes orb{to{transform:translate(40px,30px);}}
+.grain{position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");pointer-events:none;z-index:0;}
+
+/* Header */
+header{
+  position:sticky;top:0;z-index:300;
+  height:58px;padding:0 28px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(6,6,10,0.88);
+  backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border);
+}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.logo-mark{
+  width:32px;height:32px;border-radius:9px;
+  background:linear-gradient(135deg,var(--accent) 0%,#43c9a0 100%);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.logo-mark svg{width:16px;height:16px;color:#000;}
+.logo-name{font-family:'Syne',sans-serif;font-weight:800;font-size:17px;letter-spacing:-0.4px;color:var(--text);}
+.logo-name span{color:var(--accent);}
+.header-right{display:flex;align-items:center;gap:10px;}
+.hbadge{
+  font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1.5px;
+  color:var(--muted2);border:1px solid var(--border);padding:4px 12px;border-radius:100px;
+  text-transform:uppercase;
+}
+.hpulse{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted2);}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.2;}}
+
+/* Hero */
+.hero{
+  position:relative;z-index:1;
+  text-align:center;padding:64px 20px 48px;
+  max-width:700px;margin:0 auto;
+}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:'JetBrains Mono',monospace;font-size:11px;
+  letter-spacing:2.5px;text-transform:uppercase;color:var(--accent);
+  margin-bottom:20px;
+  animation:up 0.7s ease both;
+}
+.eyebrow-line{width:28px;height:1px;background:var(--accent);opacity:0.4;}
+h1{
+  font-family:'Syne',sans-serif;font-weight:800;
+  font-size:clamp(40px,8vw,76px);line-height:1;
+  letter-spacing:-2px;margin-bottom:18px;
+  animation:up 0.7s 0.1s ease both;
+}
+h1 .g{
+  background:linear-gradient(120deg,var(--accent) 0%,var(--blue) 60%,var(--amber) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.hero-p{
+  font-size:15px;color:var(--muted2);font-weight:300;
+  max-width:440px;margin:0 auto 32px;
+  animation:up 0.7s 0.2s ease both;
+}
+.steps-row{
+  display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px;
+  animation:up 0.7s 0.3s ease both;
+}
+.step-pill{
+  display:flex;align-items:center;gap:7px;
+  background:var(--s1);border:1px solid var(--border);
+  padding:6px 14px;border-radius:100px;font-size:12px;color:var(--muted2);
+}
+.step-n{
+  width:18px;height:18px;border-radius:50%;
+  background:var(--s3);font-family:'JetBrains Mono',monospace;
+  font-size:10px;color:var(--accent);
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* App grid */
+.app{
+  position:relative;z-index:1;
+  max-width:1180px;margin:0 auto;padding:0 20px 80px;
+  display:grid;grid-template-columns:500px 1fr;gap:14px;align-items:start;
+}
+
+/* Card */
+.card{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--r);overflow:hidden;
+  animation:up 0.7s 0.4s ease both;
+}
+.card2{animation-delay:0.5s;}
+.card-head{
+  padding:16px 22px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:12px;
+}
+.card-icon{
+  width:34px;height:34px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.ci-green{background:var(--accent-dim);}
+.ci-blue{background:var(--blue-dim);}
+.card-title{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;}
+.card-sub{font-size:11px;color:var(--muted);margin-top:1px;}
+.card-body{padding:22px;}
+
+/* Section */
+.sec{margin-bottom:22px;}
+.sec-label{
+  font-family:'JetBrains Mono',monospace;font-size:10px;
+  letter-spacing:2px;text-transform:uppercase;color:var(--muted);
+  margin-bottom:11px;display:flex;align-items:center;gap:8px;
+}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* Cat grid */
+.cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
+.cat-btn{
+  background:var(--s2);border:1px solid var(--border);
+  color:var(--muted2);padding:9px 12px;
+  cursor:pointer;font-family:'Instrument Sans',sans-serif;
+  font-size:12px;font-weight:400;text-align:left;
+  transition:all 0.13s;border-radius:var(--rsm);
+  display:flex;align-items:center;gap:9px;position:relative;overflow:hidden;
+}
+.cat-btn:hover{border-color:var(--border2);color:var(--text);background:var(--s3);}
+.cat-btn.active{background:var(--accent-dim);border-color:var(--accent-border);color:var(--accent);}
+.cat-btn.active .ck{opacity:1;transform:translateY(-50%) scale(1);}
+.ck{
+  position:absolute;right:9px;top:50%;transform:translateY(-50%) scale(0.5);
+  opacity:0;width:15px;height:15px;border-radius:50%;
+  background:var(--accent);display:flex;align-items:center;justify-content:center;
+  transition:all 0.13s;flex-shrink:0;
+}
+.ck svg{width:8px;height:8px;color:#000;}
+.ci{
+  width:26px;height:26px;border-radius:6px;background:var(--s3);
+  display:flex;align-items:center;justify-content:center;font-size:13px;
+  flex-shrink:0;transition:background 0.13s;
+}
+.cat-btn.active .ci{background:rgba(126,255,212,0.1);}
+
+/* Vibe pills */
+.vibe-row{display:flex;flex-wrap:wrap;gap:5px;}
+.vibe-btn{
+  background:var(--s2);border:1px solid var(--border);
+  color:var(--muted2);padding:5px 13px;cursor:pointer;
+  font-family:'JetBrains Mono',monospace;font-size:10px;
+  letter-spacing:0.8px;transition:all 0.13s;border-radius:100px;
+}
+.vibe-btn:hover{border-color:var(--border2);color:var(--text);}
+.vibe-btn.active{background:var(--blue-dim);border-color:var(--blue-border);color:var(--blue);}
+
+/* Platform multi-select */
+.platform-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;}
+.plat-btn{
+  background:var(--s2);border:1px solid var(--border);
+  color:var(--muted2);padding:9px 10px;cursor:pointer;
+  font-family:'Instrument Sans',sans-serif;font-size:11px;font-weight:500;
+  transition:all 0.13s;border-radius:var(--rsm);
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  text-align:center;position:relative;
+}
+.plat-btn:hover{border-color:var(--border2);color:var(--text);background:var(--s3);}
+.plat-btn.active{background:var(--amber-dim);border-color:var(--amber-border);color:var(--amber);}
+.plat-btn.active .pk{opacity:1;transform:scale(1);}
+.pk{
+  position:absolute;top:5px;right:5px;
+  width:13px;height:13px;border-radius:50%;
+  background:var(--amber);display:flex;align-items:center;justify-content:center;
+  opacity:0;transform:scale(0.4);transition:all 0.13s;
+}
+.pk svg{width:7px;height:7px;color:#000;}
+.plat-icon{font-size:18px;line-height:1;}
+.plat-name{font-size:10px;letter-spacing:0.3px;}
+
+/* Form fields */
+.field{margin-bottom:11px;}
+.field-label{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:5px;
+}
+.fl-text{font-size:11px;color:var(--muted2);font-weight:500;letter-spacing:0.2px;}
+.fl-tag{
+  font-family:'JetBrains Mono',monospace;font-size:9px;
+  letter-spacing:1px;text-transform:uppercase;
+  color:var(--muted);border:1px solid var(--border);
+  padding:2px 7px;border-radius:100px;
+}
+.fl-tag.req{border-color:rgba(126,255,212,0.2);color:var(--accent);}
+.field-wrap{position:relative;}
+.field-ico{
+  position:absolute;left:11px;top:50%;transform:translateY(-50%);
+  color:var(--muted);display:flex;align-items:center;pointer-events:none;
+}
+.field-ico svg{width:13px;height:13px;}
+input[type=text]{
+  width:100%;background:var(--s2);border:1px solid var(--border);
+  color:var(--text);padding:9px 11px 9px 32px;
+  font-family:'Instrument Sans',sans-serif;font-size:13px;
+  outline:none;transition:border-color 0.15s,background 0.15s;
+  border-radius:var(--rsm);
+}
+input[type=text]:focus{border-color:var(--accent-border);background:var(--s3);}
+input::placeholder{color:var(--s4);}
+
+/* 2-col fields */
+.fields-2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+
+/* Generate btn */
+.gen-btn{
+  width:100%;background:var(--accent);color:#000;border:none;
+  padding:13px 20px;font-family:'Syne',sans-serif;font-weight:700;
+  font-size:15px;letter-spacing:0.2px;cursor:pointer;
+  transition:all 0.2s;border-radius:var(--rsm);
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  position:relative;overflow:hidden;
+}
+.gen-btn::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.12) 0%,transparent 60%);
+  opacity:0;transition:opacity 0.2s;
+}
+.gen-btn:hover::after{opacity:1;}
+.gen-btn:hover{transform:translateY(-1px);box-shadow:0 10px 30px rgba(126,255,212,0.18);}
+.gen-btn:active{transform:translateY(0);box-shadow:none;}
+.gen-btn:disabled{background:var(--s3);color:var(--muted);cursor:not-allowed;transform:none;box-shadow:none;}
+.gen-btn svg{width:15px;height:15px;}
+
+/* Output card */
+.out-card{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--r);overflow:hidden;
+  position:sticky;top:72px;
+  animation:up 0.7s 0.5s ease both;
+}
+
+/* Empty */
+.empty{
+  padding:70px 30px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:14px;text-align:center;
+}
+.empty-box{
+  width:72px;height:72px;border-radius:18px;
+  background:var(--s2);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+}
+.empty-box svg{width:28px;height:28px;color:var(--s4);}
+.empty-t{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;color:var(--muted2);}
+.empty-s{font-size:12px;color:var(--muted);max-width:200px;line-height:1.5;}
+
+/* Loading */
+.loading{padding:70px 30px;display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;}
+.loading.show{display:flex;}
+.spin{
+  width:40px;height:40px;border-radius:50%;
+  border:2px solid var(--s3);border-top-color:var(--accent);
+  animation:spin 0.7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-t{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;}
+.loading-t::after{content:'';animation:dots 1.4s steps(4,end) infinite;}
+@keyframes dots{0%,20%{content:'';}40%{content:'.';}60%{content:'..';}80%,100%{content:'...'}}
+
+/* Result */
+.result{display:none;}
+.result.show{display:block;}
+
+.result-topbar{
+  padding:14px 20px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+}
+.rtags{display:flex;gap:5px;flex-wrap:wrap;}
+.rtag{
+  font-family:'JetBrains Mono',monospace;font-size:9px;
+  letter-spacing:1.2px;text-transform:uppercase;
+  padding:3px 9px;border-radius:100px;border:1px solid;
+}
+.rtag-g{border-color:var(--accent-border);color:var(--accent);background:var(--accent-dim);}
+.rtag-b{border-color:var(--blue-border);color:var(--blue);background:var(--blue-dim);}
+.rtag-a{border-color:var(--amber-border);color:var(--amber);background:var(--amber-dim);}
+
+.redo-btn{
+  display:flex;align-items:center;gap:5px;
+  background:var(--s2);border:1px solid var(--border);
+  color:var(--muted2);padding:5px 13px;cursor:pointer;
+  font-family:'JetBrains Mono',monospace;font-size:10px;
+  letter-spacing:1px;text-transform:uppercase;
+  border-radius:100px;transition:all 0.13s;white-space:nowrap;
+}
+.redo-btn:hover{border-color:var(--border2);color:var(--text);}
+.redo-btn svg{width:11px;height:11px;}
+
+.result-body{padding:16px 20px 0;}
+
+/* Prompt block */
+.pb{
+  background:var(--s2);border:1px solid var(--border);
+  border-radius:var(--rsm);margin-bottom:10px;overflow:hidden;
+  transition:border-color 0.13s;
+}
+.pb:hover{border-color:var(--border2);}
+.pb-head{
+  padding:10px 14px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+}
+.pb-left{display:flex;align-items:center;gap:9px;}
+.pb-ico{
+  width:28px;height:28px;border-radius:7px;background:var(--s3);
+  display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;
+}
+.pb-name{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;}
+.pb-how{font-size:10px;color:var(--muted);margin-top:1px;font-family:'JetBrains Mono',monospace;letter-spacing:0.3px;}
+.cpbtn{
+  display:flex;align-items:center;gap:5px;
+  background:var(--s3);border:1px solid var(--border);
+  color:var(--muted2);padding:5px 12px;cursor:pointer;
+  font-family:'JetBrains Mono',monospace;font-size:10px;
+  letter-spacing:1px;text-transform:uppercase;
+  border-radius:100px;transition:all 0.13s;flex-shrink:0;
+  white-space:nowrap;
+}
+.cpbtn:hover{border-color:var(--accent-border);color:var(--accent);}
+.cpbtn.done{border-color:var(--accent-border);color:var(--accent);background:var(--accent-dim);}
+.cpbtn svg{width:10px;height:10px;}
+.pb-text{
+  padding:13px 14px;
+  font-family:'JetBrains Mono',monospace;font-size:11px;
+  line-height:1.9;color:var(--muted2);
+  white-space:pre-wrap;word-break:break-word;
+  max-height:200px;overflow-y:auto;
+}
+.pb-text::-webkit-scrollbar{width:4px;}
+.pb-text::-webkit-scrollbar-track{background:transparent;}
+.pb-text::-webkit-scrollbar-thumb{background:var(--s4);border-radius:2px;}
+
+/* Tips */
+.tips{
+  background:rgba(126,255,212,0.03);border:1px solid var(--accent-border);
+  border-radius:var(--rsm);padding:14px;margin-bottom:10px;
+}
+.tips-head{display:flex;align-items:center;gap:8px;margin-bottom:11px;}
+.tips-ico{
+  width:22px;height:22px;border-radius:5px;background:var(--accent-dim);
+  display:flex;align-items:center;justify-content:center;
+}
+.tips-ico svg{width:12px;height:12px;color:var(--accent);}
+.tips-t{font-family:'Syne',sans-serif;font-weight:700;font-size:12px;color:var(--accent);}
+.tip{display:flex;gap:9px;font-size:11px;color:var(--muted2);margin-bottom:8px;line-height:1.55;}
+.tip:last-child{margin-bottom:0;}
+.tip-n{
+  width:17px;height:17px;border-radius:50%;background:var(--accent-dim);
+  font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--accent);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;
+}
+
+/* Bottom bar */
+.result-bar{
+  padding:14px 20px;border-top:1px solid var(--border);
+  display:flex;gap:8px;
+}
+.bar-btn{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:7px;
+  padding:10px 14px;cursor:pointer;font-family:'Instrument Sans',sans-serif;
+  font-size:12px;font-weight:500;border-radius:var(--rsm);transition:all 0.15s;border:1px solid;
+}
+.bar-btn svg{width:13px;height:13px;}
+.bar-tg{
+  background:var(--blue-dim);border-color:var(--blue-border);color:var(--blue);
+}
+.bar-tg:hover{background:rgba(126,184,255,0.14);border-color:rgba(126,184,255,0.4);}
+
+/* Platform info strip */
+.pstrip{
+  position:relative;z-index:1;
+  max-width:1180px;margin:0 auto;padding:0 20px 60px;
+}
+.pstrip-head{
+  font-family:'JetBrains Mono',monospace;font-size:10px;
+  letter-spacing:2px;text-transform:uppercase;color:var(--muted);
+  margin-bottom:12px;display:flex;align-items:center;gap:10px;
+}
+.pstrip-head::after{content:'';flex:1;height:1px;background:var(--border);}
+.pstrip-grid{
+  display:grid;grid-template-columns:repeat(6,1fr);gap:6px;
+}
+.pc{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--rsm);padding:14px 12px;
+  display:flex;flex-direction:column;align-items:center;gap:7px;
+  text-align:center;
+}
+.pc-icon{font-size:22px;}
+.pc-name{font-family:'Syne',sans-serif;font-weight:700;font-size:11px;}
+.pc-desc{font-size:10px;color:var(--muted);line-height:1.4;}
+
+/* Toast */
+.toast{
+  position:fixed;bottom:24px;left:50%;
+  transform:translateX(-50%) translateY(14px);
+  background:var(--s3);border:1px solid var(--border2);
+  color:var(--text);padding:9px 18px;
+  font-family:'JetBrains Mono',monospace;font-size:10px;
+  letter-spacing:1.5px;text-transform:uppercase;
+  opacity:0;transition:all 0.22s;border-radius:100px;
+  z-index:999;display:flex;align-items:center;gap:7px;white-space:nowrap;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.t-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);}
+
+/* Animations */
+@keyframes up{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--s3);border-radius:3px;}
+
+/* Responsive */
+@media(max-width:960px){
+  .app{grid-template-columns:1fr;}
+  .out-card{position:static;}
+  .pstrip-grid{grid-template-columns:repeat(3,1fr);}
+}
+@media(max-width:600px){
+  header{padding:0 16px;}
+  .hero{padding:48px 16px 36px;}
+  .app,.pstrip{padding-left:12px;padding-right:12px;}
+  .platform-grid{grid-template-columns:repeat(3,1fr);}
+  .fields-2{grid-template-columns:1fr;}
+  .pstrip-grid{grid-template-columns:repeat(2,1fr);}
+}
+</style>
+</head>
+<body>
+
+<div class="ambient">
+  <div class="ambient-orb orb1"></div>
+  <div class="ambient-orb orb2"></div>
+  <div class="ambient-orb orb3"></div>
+</div>
+<div class="grain"></div>
+
+<header>
+  <a class="logo" href="#">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+    </div>
+    <div class="logo-name">Flyer<span>Factory</span></div>
+  </a>
+  <div class="header-right">
+    <div class="hpulse"><div class="dot"></div>Free</div>
+    <div class="hbadge">AI Prompt Gen</div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="eyebrow">
+    <div class="eyebrow-line"></div>
+    Pro-grade flyer prompts
+    <div class="eyebrow-line"></div>
+  </div>
+  <h1>Build <span class="g">Any Flyer</span><br/>With AI</h1>
+  <p class="hero-p">Describe your flyer, pick your platforms. Get precisely structured AI prompts that actually produce professional results.</p>
+  <div class="steps-row">
+    <div class="step-pill"><div class="step-n">1</div>Choose type & vibe</div>
+    <div class="step-pill"><div class="step-n">2</div>Select platforms</div>
+    <div class="step-pill"><div class="step-n">3</div>Add your content</div>
+    <div class="step-pill"><div class="step-n">4</div>Copy & create</div>
+  </div>
+</section>
+
+<div class="app">
+
+  <!-- CONFIG PANEL -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon ci-green">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7effd4" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/></svg>
+      </div>
+      <div>
+        <div class="card-title">Configure Your Flyer</div>
+        <div class="card-sub">Fill all fields for the best prompt quality</div>
+      </div>
+    </div>
+    <div class="card-body">
+
+      <!-- Flyer Type -->
+      <div class="sec">
+        <div class="sec-label">01 · Flyer Type</div>
+        <div class="cat-grid" id="catGrid">
+          <button class="cat-btn" data-cat="business">
+            <div class="ci">🏢</div>Business Promo
+            <div class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+          </button>
+          <button class="cat-btn" data-cat="event">
+            <div class="ci">🎉</div>Event / Party
+            <div class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+          </button>
+          <button class="cat-btn" data-cat="brand">
+            <div class="ci">🎤</div>Personal Brand
+            <div class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+          </button>
+          <button class="cat-btn" data-cat="launch">
+            <div class="ci">🚀</div>Product Launch
+            <div class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+          </button>
+          <button class="cat-btn" data-cat="creator">
+            <div class="ci">📱</div>Social / Creator
+            <div class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+          </button>
+          <button class="cat-btn" data-cat="crypto">
+            <div class="ci">⛓️</div>Crypto / Web3
+            <div class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Vibe -->
+      <div class="sec">
+        <div class="sec-label">02 · Visual Style</div>
+        <div class="vibe-row" id="vibeGrid">
+          <button class="vibe-btn" data-vibe="luxury">Luxury</button>
+          <button class="vibe-btn" data-vibe="minimal">Minimal</button>
+          <button class="vibe-btn" data-vibe="bold-street">Bold Street</button>
+          <button class="vibe-btn" data-vibe="neon-cyber">Neon Cyber</button>
+          <button class="vibe-btn" data-vibe="clean-modern">Clean Modern</button>
+          <button class="vibe-btn" data-vibe="retro">Retro Vintage</button>
+          <button class="vibe-btn" data-vibe="dark">Dark Dramatic</button>
+          <button class="vibe-btn" data-vibe="playful">Playful Pop</button>
+          <button class="vibe-btn" data-vibe="editorial">Editorial</button>
+          <button class="vibe-btn" data-vibe="organic">Organic</button>
+          <button class="vibe-btn" data-vibe="afro">Afrocentric</button>
+          <button class="vibe-btn" data-vibe="futuristic">Futuristic</button>
+        </div>
+      </div>
+
+      <!-- Platform multi-select -->
+      <div class="sec">
+        <div class="sec-label">03 · Platforms <span style="font-size:9px;letter-spacing:0px;text-transform:none;color:var(--muted);margin-left:4px;">(pick any)</span></div>
+        <div class="platform-grid" id="platformGrid">
+          <button class="plat-btn active" data-plat="midjourney">
+            <div class="plat-icon">🎨</div>
+            <div class="plat-name">Midjourney</div>
+            <div class="pk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+          </button>
+          <button class="plat-btn active" data-plat="chatgpt">
+            <div class="plat-icon">⚡</div>
+            <div class="plat-name">ChatGPT</div>
+            <div class="pk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+          </button>
+          <button class="plat-btn" data-plat="canva">
+            <div class="plat-icon">🖌️</div>
+            <div class="plat-name">Canva AI</div>
+            <div class="pk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+          </button>
+          <button class="plat-btn" data-plat="ideogram">
+            <div class="plat-icon">🔤</div>
+            <div class="plat-name">Ideogram</div>
+            <div class="pk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+          </button>
+          <button class="plat-btn" data-plat="firefly">
+            <div class="plat-icon">🔥</div>
+            <div class="plat-name">Firefly</div>
+            <div class="pk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+          </button>
+          <button class="plat-btn" data-plat="leonardo">
+            <div class="plat-icon">🦁</div>
+            <div class="plat-name">Leonardo</div>
+            <div class="pk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Content Fields -->
+      <div class="sec">
+        <div class="sec-label">04 · Flyer Content</div>
+
+        <div class="field">
+          <div class="field-label">
+            <span class="fl-text">Main Headline (Brand / Event Name)</span>
+            <span class="fl-tag req">Required</span>
+          </div>
+          <div class="field-wrap">
+            <div class="field-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></div>
+            <input type="text" id="fHeadline" placeholder="e.g. SOFARAK · Grand Opening · Token Drop"/>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">
+            <span class="fl-text">Subheadline / Tagline</span>
+            <span class="fl-tag">Optional</span>
+          </div>
+          <div class="field-wrap">
+            <div class="field-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="21" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="21" y1="18" x2="3" y2="18"/></svg></div>
+            <input type="text" id="fSub" placeholder="e.g. 'Where the Future Begins' · Season 2 · Vol. 3"/>
+          </div>
+        </div>
+
+        <div class="fields-2">
+          <div class="field">
+            <div class="field-label">
+              <span class="fl-text">Date</span>
+              <span class="fl-tag">Optional</span>
+            </div>
+            <div class="field-wrap">
+              <div class="field-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+              <input type="text" id="fDate" placeholder="OCT 25 · 2025"/>
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-label">
+              <span class="fl-text">Time</span>
+              <span class="fl-tag">Optional</span>
+            </div>
+            <div class="field-wrap">
+              <div class="field-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+              <input type="text" id="fTime" placeholder="8 PM / Doors open 7PM"/>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">
+            <span class="fl-text">Venue / Location</span>
+            <span class="fl-tag">Optional</span>
+          </div>
+          <div class="field-wrap">
+            <div class="field-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+            <input type="text" id="fVenue" placeholder="e.g. The Civic Centre, Lagos Island"/>
+          </div>
+        </div>
+
+      <div class="field">
+        <div class="field-label">
+          <span class="fl-text">Call to Action</span>
+          <span class="fl-tag">Optional</span>
+        </div>
+          <div class="field-wrap">
+            <div class="field-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+            <input type="text" id="fCta" placeholder="e.g. Get Tickets · Register Now · t.me/channel"/>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">
+            <span class="fl-text">Color Palette / Brand Colors</span>
+            <span class="fl-tag">Optional</span>
+          </div>
+          <div class="field-wrap">
+            <div class="field-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg></div>
+            <input type="text" id="fColors" placeholder="e.g. deep gold #D4AF37 + matte black + ivory white"/>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">
+            <span class="fl-text">Extra Context / Mood Notes</span>
+            <span class="fl-tag">Optional</span>
+          </div>
+          <div class="field-wrap">
+            <div class="field-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+            <input type="text" id="fExtra" placeholder="e.g. Lagos skyline, upscale African audience, feminine energy"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="fields-2">
+        <div class="field">
+          <div class="field-label">
+            <span class="fl-text">Contact Phone</span>
+            <span class="fl-tag">Optional</span>
+          </div>
+          <div class="field-wrap">
+            <div class="field-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.11 4.18 2 2 0 0 1 4.09 2h3a2 2 0 0 1 2 1.72c.12.81.31 1.6.57 2.36a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.72-1.72a2 2 0 0 1 2.11-.45c.76.26 1.55.45 2.36.57a2 2 0 0 1 1.72 2z"/></svg></div>
+            <input type="text" id="fPhone" placeholder="e.g. +234 812 345 6789"/>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">
+            <span class="fl-text">Contact Email</span>
+            <span class="fl-tag">Optional</span>
+          </div>
+          <div class="field-wrap">
+            <div class="field-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+            <input type="text" id="fEmail" placeholder="e.g. hello@flyerfactory.ai"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-label">
+          <span class="fl-text">Website / Social Handle</span>
+          <span class="fl-tag">Optional</span>
+        </div>
+        <div class="field-wrap">
+          <div class="field-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15 15 0 0 1 0 20"/><path d="M12 2a15 15 0 0 0 0 20"/></svg></div>
+          <input type="text" id="fHandle" placeholder="e.g. flyerfactory.com / @flyerfactory"/>
+        </div>
+      </div>
+
+      <button class="gen-btn" id="genBtn" onclick="generate()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        Generate Prompts
+      </button>
+
+    </div>
+  </div>
+
+  <!-- OUTPUT PANEL -->
+  <div class="out-card" id="outCard">
+
+    <div class="empty" id="emptyState">
+      <div class="empty-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/></svg>
+      </div>
+      <div class="empty-t">Your prompts appear here</div>
+      <div class="empty-s">Configure your flyer on the left, then hit Generate</div>
+    </div>
+
+    <div class="loading" id="loadingState">
+      <div class="spin"></div>
+      <div class="loading-t">Engineering your prompts</div>
+    </div>
+
+    <div class="result" id="resultState">
+      <div class="result-topbar">
+        <div class="rtags" id="rtags"></div>
+        <button class="redo-btn" onclick="reset()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.29"/></svg>
+          New
+        </button>
+      </div>
+      <div class="result-body" id="resultBody"></div>
+      <div class="result-bar">
+        <button class="bar-btn bar-tg" onclick="tgShare()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Share to Telegram
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Platform strip -->
+<div class="pstrip">
+  <div class="pstrip-head">Supported Platforms</div>
+  <div class="pstrip-grid">
+    <div class="pc"><div class="pc-icon">🎨</div><div class="pc-name">Midjourney</div><div class="pc-desc">Discord /imagine · Best for artistic realism</div></div>
+    <div class="pc"><div class="pc-icon">⚡</div><div class="pc-name">ChatGPT</div><div class="pc-desc">GPT-4o Image · Best for readable text</div></div>
+    <div class="pc"><div class="pc-icon">🖌️</div><div class="pc-name">Canva AI</div><div class="pc-desc">Magic Design · Best for editable layouts</div></div>
+    <div class="pc"><div class="pc-icon">🔤</div><div class="pc-name">Ideogram</div><div class="pc-desc">ideogram.ai · Best typography accuracy</div></div>
+    <div class="pc"><div class="pc-icon">🔥</div><div class="pc-name">Adobe Firefly</div><div class="pc-desc">Commercially safe · Brand consistent</div></div>
+    <div class="pc"><div class="pc-icon">🦁</div><div class="pc-name">Leonardo AI</div><div class="pc-desc">leonardo.ai · Fine-tune control</div></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><div class="t-dot"></div><span id="tMsg">Copied!</span></div>
+
+<script>
+// State
+let cat = null, vibe = null;
+let platforms = new Set(['midjourney','chatgpt']);
+let stored = {};
+
+// Vibe specs — structured for proper prompt injection
+const VIBES = {
+  'luxury': {
+    label:'Luxury',
+    visual:'ultra-premium luxury aesthetic, matte black background, champagne gold foil accents, ivory white typography, velvet and silk material textures, dramatic single-source spotlight lighting, high-fashion magazine composition',
+    colors_default:'deep matte black, champagne gold, ivory white',
+    mj_params:'--ar 9:16 --v 6.1 --style raw --q 2',
+    mj_neg:'--no cartoon, amateur, cluttered, cheap, digital gradients, purple',
+    chatgpt_directive:'ultra-premium luxury print aesthetic',
+    ideogram_style:'DESIGN',
+    firefly_style:'art deco, luxury brand, premium editorial',
+    canva_style:'Luxury dark editorial',
+    leonardo_style:'luxury poster, cinematic editorial'
+  },
+  'minimal':{
+    label:'Minimal',
+    visual:'brutally minimal poster, extreme negative space, single bold typographic hero, Swiss grid precision, stark two-color palette, no decoration, clean geometric lines',
+    colors_default:'pure white background, jet black type, one sharp accent',
+    mj_params:'--ar 9:16 --v 6.1 --style raw',
+    mj_neg:'--no busy, decorative, gradients, shadows, ornaments, complex',
+    chatgpt_directive:'brutalist minimal print design',
+    ideogram_style:'DESIGN',
+    firefly_style:'Swiss minimalism, typographic poster',
+    canva_style:'Minimalist black and white',
+    leonardo_style:'minimal typographic poster'
+  },
+  'bold-street':{
+    label:'Bold Street',
+    visual:'raw street art poster on aged concrete wall texture, spray paint drips and splatter, thick graffiti-style stencil lettering, aerosol paint layers, urban decay elements, hand-made screen print feel, gritty underground aesthetic',
+    colors_default:'black, white, bold red or neon yellow on concrete grey',
+    mj_params:'--ar 9:16 --v 6.1 --style raw --chaos 20',
+    mj_neg:'--no clean, digital, polished, corporate, soft lighting, photorealistic',
+    chatgpt_directive:'bold street art graffiti poster aesthetic',
+    ideogram_style:'GRUNGE',
+    firefly_style:'street art, graffiti, urban poster, spray paint',
+    canva_style:'Bold urban graffiti street art',
+    leonardo_style:'street art poster, graffiti, spray paint'
+  },
+  'neon-cyber':{
+    label:'Neon Cyber',
+    visual:'cyberpunk neon poster, electric neon tube light trails, pitch black background, holographic glitch scanlines, chrome metallic reflective surfaces, volumetric light fog, isometric data grid overlay',
+    colors_default:'electric cyan #00f5ff, hot magenta #ff0090, acid green #39ff14 on black',
+    mj_params:'--ar 9:16 --v 6.1 --style raw',
+    mj_neg:'--no warm colors, natural light, organic, soft, pastel',
+    chatgpt_directive:'cyberpunk neon glowing futuristic poster',
+    ideogram_style:'NEON',
+    firefly_style:'cyberpunk, neon noir, sci-fi poster',
+    canva_style:'Cyberpunk neon dark',
+    leonardo_style:'neon cyberpunk poster, glowing lights'
+  },
+  'clean-modern':{
+    label:'Clean Modern',
+    visual:'contemporary clean graphic design, professional airy layout, strong typographic hierarchy, geometric accent shapes, generous whitespace, balanced asymmetric composition, premium corporate feel',
+    colors_default:'off-white or light grey, deep navy or slate, bold single brand accent',
+    mj_params:'--ar 9:16 --v 6.1',
+    mj_neg:'--no retro, grunge, hand-drawn, dark, messy',
+    chatgpt_directive:'clean modern professional graphic design poster',
+    ideogram_style:'DESIGN',
+    firefly_style:'modern corporate, clean design, geometric',
+    canva_style:'Clean modern professional',
+    leonardo_style:'clean modern design poster'
+  },
+  'retro':{
+    label:'Retro Vintage',
+    visual:'vintage retro poster, distressed worn paper texture, aged letterpress typography, 1970s screen-print halftone dot patterns, sun-bleached color palette, nostalgic analog feel, slightly faded ink',
+    colors_default:'warm cream, rust orange, mustard yellow, deep brown, faded red',
+    mj_params:'--ar 9:16 --v 6.1 --style raw',
+    mj_neg:'--no digital, modern, neon, glossy, clean edges',
+    chatgpt_directive:'vintage retro letterpress poster design',
+    ideogram_style:'VINTAGE',
+    firefly_style:'vintage poster, retro, letterpress, halftone',
+    canva_style:'Vintage retro warm tones',
+    leonardo_style:'vintage retro poster, worn print'
+  },
+  'dark':{
+    label:'Dark Dramatic',
+    visual:'cinematic dark dramatic poster, single intense spotlight from above, deep shadow fill, atmospheric smoke wisps, theatrical chiaroscuro contrast, film noir noir composition, mysterious moody presence',
+    colors_default:'near black, deep charcoal, single bright accent color or cool blue tones',
+    mj_params:'--ar 9:16 --v 6.1 --style raw --q 2',
+    mj_neg:'--no bright, daylight, cheerful, flat, colorful background',
+    chatgpt_directive:'dark cinematic dramatic movie poster aesthetic',
+    ideogram_style:'CINEMATIC',
+    firefly_style:'cinematic dark, dramatic lighting, noir poster',
+    canva_style:'Dark dramatic cinematic',
+    leonardo_style:'dark moody cinematic poster'
+  },
+  'playful':{
+    label:'Playful Pop',
+    visual:'vibrant pop art poster, bold saturated flat colors, joyful cartoon graphic elements, Memphis design pattern accents, starburst and confetti shapes, playful energetic layout, maximum fun',
+    colors_default:'electric yellow, hot coral #FF6B6B, sky blue, lime green, all vivid and bold',
+    mj_params:'--ar 9:16 --v 6.1',
+    mj_neg:'--no dark, muted, serious, corporate, subtle, photorealistic',
+    chatgpt_directive:'vibrant playful pop art graphic poster',
+    ideogram_style:'VIBRANT',
+    firefly_style:'pop art, playful, bold graphic, Memphis design',
+    canva_style:'Colorful playful pop art',
+    leonardo_style:'playful pop art poster, bold colors'
+  },
+  'editorial':{
+    label:'Editorial',
+    visual:'high-fashion editorial magazine spread, avant-garde asymmetric layout, oversized bold typography breaking grid, sophisticated color treatment, Vogue or Wallpaper magazine aesthetic, artful negative space',
+    colors_default:'sophisticated neutrals — warm white, taupe, black — one strong ink accent',
+    mj_params:'--ar 9:16 --v 6.1 --style raw',
+    mj_neg:'--no generic, corporate, flat design, symmetrical, amateur',
+    chatgpt_directive:'high-fashion editorial magazine cover aesthetic',
+    ideogram_style:'DESIGN',
+    firefly_style:'editorial fashion, magazine layout, avant-garde',
+    canva_style:'High fashion editorial magazine',
+    leonardo_style:'fashion editorial magazine poster'
+  },
+  'organic':{
+    label:'Organic',
+    visual:'natural organic botanical poster, hand-painted watercolor wash background, delicate pressed botanical elements, warm diffused natural window light, artisan craft aesthetic, flowing soft composition',
+    colors_default:'forest sage green, warm terracotta, sand beige, natural cream white',
+    mj_params:'--ar 9:16 --v 6.1',
+    mj_neg:'--no digital, sharp edges, neon, dark, metallic, geometric',
+    chatgpt_directive:'organic natural botanical handcrafted poster',
+    ideogram_style:'DESIGN',
+    firefly_style:'organic botanical, watercolor, natural, artisan',
+    canva_style:'Organic botanical watercolor',
+    leonardo_style:'organic botanical watercolor poster'
+  },
+  'afro':{
+    label:'Afrocentric',
+    visual:'bold Afrocentric graphic design, rich kente-inspired geometric patterns, warm deep earth tones with vibrant accent colors, powerful high-contrast composition, African artistic motifs, celebratory and proud visual language',
+    colors_default:'deep earth red, warm gold, forest green, rich black, ivory — inspired by pan-African palette',
+    mj_params:'--ar 9:16 --v 6.1 --style raw',
+    mj_neg:'--no generic, western corporate, washed out, minimal',
+    chatgpt_directive:'bold Afrocentric graphic design poster',
+    ideogram_style:'DESIGN',
+    firefly_style:'Afrocentric design, kente pattern, African art, bold',
+    canva_style:'Bold Afrocentric geometric',
+    leonardo_style:'Afrocentric bold graphic design poster'
+  },
+  'futuristic':{
+    label:'Futuristic',
+    visual:'sleek futuristic sci-fi poster, clean white or silver surfaces, holographic UI overlay elements, abstract geometric light forms, space and cosmos visual language, minimal but technically advanced aesthetic',
+    colors_default:'crisp white, silver, electric blue, holographic iridescent accents on dark void',
+    mj_params:'--ar 9:16 --v 6.1 --style raw',
+    mj_neg:'--no vintage, retro, warm colors, hand-made, dirty, organic',
+    chatgpt_directive:'sleek futuristic sci-fi technology poster',
+    ideogram_style:'DESIGN',
+    firefly_style:'futuristic sci-fi, holographic, space tech',
+    canva_style:'Futuristic holographic sci-fi',
+    leonardo_style:'futuristic sci-fi holographic poster'
+  }
+};
+
+const CAT_LABELS = {
+  business:'Business Promo',event:'Event / Party',brand:'Personal Brand',
+  launch:'Product Launch',creator:'Social / Creator',crypto:'Crypto / Web3'
+};
+
+// Event bindings
+document.querySelectorAll('.cat-btn').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.cat-btn').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active'); cat=b.dataset.cat;
+  });
+});
+
+document.querySelectorAll('.vibe-btn').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.vibe-btn').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active'); vibe=b.dataset.vibe;
+  });
+});
+
+document.querySelectorAll('.plat-btn').forEach(b=>{
+  b.addEventListener('click',()=>{
+    const p=b.dataset.plat;
+    if(platforms.has(p)){
+      if(platforms.size>1){platforms.delete(p);b.classList.remove('active');}
+      else{toast('Select at least one platform');}
+    } else {
+      platforms.add(p);b.classList.add('active');
+    }
+  });
+});
+
+// Field helpers
+const gv=id=>document.getElementById(id).value.trim();
+
+function buildContentBlock(){
+  const h=gv('fHeadline'), s=gv('fSub'), d=gv('fDate'),
+        t=gv('fTime'), v=gv('fVenue'), c=gv('fCta'),
+        col=gv('fColors'), ex=gv('fExtra'), p=gv('fPhone'),
+        e=gv('fEmail'), w=gv('fHandle');
+  const lines=[];
+  if(h) lines.push(`HEADLINE: "${h}"`);
+  if(s) lines.push(`SUBHEADLINE: "${s}"`);
+  if(d||t) lines.push(`DATE/TIME: ${[d,t].filter(Boolean).join(' · ')}`);
+  if(v) lines.push(`VENUE: "${v}"`);
+  if(c) lines.push(`CTA: "${c}"`);
+  if(p) lines.push(`PHONE: ${p}`);
+  if(e) lines.push(`EMAIL: ${e}`);
+  if(w) lines.push(`WEB/SOCIAL: ${w}`);
+  if(col) lines.push(`COLORS: ${col}`);
+  if(ex) lines.push(`CONTEXT: ${ex}`);
+  return lines.join('\n');
+}
+
+async function generate(){
+  if(!cat||!vibe){toast('Pick a flyer type and visual style first'); return;}
+  const h=gv('fHeadline');
+  if(!h){toast('Enter your main headline'); return;}
+
+  const vi=VIBES[vibe];
+  const catLabel=CAT_LABELS[cat];
+  const colorPalette=gv('fColors')||vi.colors_default;
+  const content=buildContentBlock();
+  const platList=[...platforms];
+
+  // Show loading
+  document.getElementById('emptyState').style.display='none';
+  document.getElementById('resultState').classList.remove('show');
+  document.getElementById('loadingState').classList.add('show');
+  document.getElementById('genBtn').disabled=true;
+
+  const sys=`You are a world-class AI prompt engineer. You write precise, structured image generation prompts. Each platform has different syntax and you know them deeply. Return ONLY valid JSON.`;
+
+  const promptMap={};
+  platList.forEach(p=>{ promptMap[p]=""; });
+
+  const instructions=platList.map(p=>{
+    if(p==='midjourney') return `
+"midjourney": Start with the dominant visual element/scene (NOT "a flyer for"). Build: [visual scene], [style: ${vi.visual}], [typography instruction: the word "${h}" as dominant headline text in [position] of frame], ${gv('fSub')?`[subtext: "${gv('fSub')}" smaller below headline],`:''}${gv('fDate')||gv('fTime')?`[date text: "${[gv('fDate'),gv('fTime')].filter(Boolean).join(' · ')}" in lower third],`:''}${gv('fPhone')?`[phone: "${gv('fPhone')}" footer],`:''}${gv('fEmail')?`[email: "${gv('fEmail')}" footer],`:''}${gv('fHandle')?`[website/handle: "${gv('fHandle')}" footer],`:''} [color: ${colorPalette}], [lighting], [quality]. End with: ${vi.mj_params} ${vi.mj_neg}`;
+    if(p==='chatgpt') return `
+"chatgpt": Start with "Design a ${catLabel} flyer image with the following layout:". Then specify layout as a top-to-bottom description: top area content, center hero, bottom third text. Include EXACT text strings: headline "${h}", ${gv('fSub')?`subheadline "${gv('fSub')}", `:''}${gv('fDate')?`date "${gv('fDate')}", `:''}${gv('fVenue')?`venue "${gv('fVenue')}", `:''}${gv('fCta')?`CTA "${gv('fCta')}", `:''}${gv('fPhone')?`phone "${gv('fPhone')}", `:''}${gv('fEmail')?`email "${gv('fEmail')}", `:''}${gv('fHandle')?`website/handle "${gv('fHandle')}"`:''} — specify each text element MUST be legible. Style: ${vi.chatgpt_directive}. Colors: ${colorPalette}. Vertical 9:16, print quality, 300dpi.`;
+    if(p==='ideogram') return `
+"ideogram": Write for Ideogram.ai which excels at text accuracy. Format: descriptive visual first, then text elements in quotes. Include style tag at end: [${vi.ideogram_style}]. Be direct, specify exact text strings as "${h}" as headline. Keep under 200 chars.`;
+    if(p==='canva') return `
+"canva": Write for Canva Magic Design. Start with the design request, specify layout style (${vi.canva_style}), include all text content as natural description. Canva will create an editable template. Keep it clear and instructional, under 150 chars.`;
+    if(p==='firefly') return `
+"firefly": Write for Adobe Firefly. Style: ${vi.firefly_style}. Include subject, mood, lighting, colors. NO text strings in Firefly prompts (it handles text overlays separately). Focus on visual scene and atmosphere.`;
+    if(p==='leonardo') return `
+"leonardo": Write for Leonardo.ai. Style: ${vi.leonardo_style}. Include visual elements, composition, lighting, color. Use format: [subject], [style], [lighting], [color palette], [quality modifiers]. Specify the design should include bold readable headline text "${h}".`;
+    return `"${p}": ""`;
+  }).join(',\n');
+
+  const userMsg=`Generate AI image prompts for this flyer. Return ONLY JSON with these keys: ${platList.map(p=>`"${p}"`).join(', ')}, "tips".
+
+FLYER BRIEF:
+Category: ${catLabel}
+Visual Style: ${vi.label} — ${vi.visual}
+${content}
+
+PLATFORM INSTRUCTIONS:
+${instructions}
+
+"tips": Array of 3 highly specific tips for this exact combination of ${catLabel} + ${vi.label} style. Tips must be actionable, platform-specific where relevant, and avoid generic advice.`;
+
+  try {
+    const r=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        model:"claude-sonnet-4-20250514",
+        max_tokens:1000,
+        system:sys,
+        messages:[{role:"user",content:userMsg}]
+      })
+    });
+    const d=await r.json();
+    const raw=d.content[0].text.replace(/```json|```/g,'').trim();
+    stored=JSON.parse(raw);
+    renderResult(stored, catLabel, h);
+  } catch(e) {
+    stored=buildFallback(vi, catLabel, h, colorPalette, platList);
+    renderResult(stored, catLabel, h);
+  }
+
+  document.getElementById('loadingState').classList.remove('show');
+  document.getElementById('genBtn').disabled=false;
+}
+
+function buildFallback(vi, catLabel, headline, colors, platList){
+  const d=gv('fDate'), t=gv('fTime'), ve=gv('fVenue'), s=gv('fSub'), c=gv('fCta');
+  const p=gv('fPhone'), e=gv('fEmail'), w=gv('fHandle');
+  const dateStr=d||t?`${d}${t?' · '+t:''}`:'';
+  const out={};
+
+  if(platList.includes('midjourney')){
+    out.midjourney=`${vi.visual}, bold typographic headline reading "${headline}" centered upper third${s?`, subtext "${s}" below headline`:''}${dateStr?`, date text "${dateStr}" lower third`:''}${ve?`, venue "${ve}" bottom edge`:''}${c?`, CTA text "${c}" bottom`:''}${p?`, phone "${p}" in footer`:''}${e?`, email "${e}" in footer`:''}${w?`, website "${w}" in footer`:''}. Color palette: ${colors}. Ultra high resolution, sharp focus, professional print quality ${vi.mj_params} ${vi.mj_neg}`;
+  }
+  if(platList.includes('chatgpt')){
+    out.chatgpt=`Design a ${catLabel} flyer image with the following layout:\nTOP THIRD: dominant headline text "${headline}" in large bold typography${s?`\nMIDDLE: subheadline text "${s}" in medium weight`:''}${dateStr?`\nLOWER MIDDLE: date and time "${dateStr}" clearly legible`:''}${ve?`\nBOTTOM AREA: venue "${ve}" in smaller clean type`:''}${c?`\nBOTTOM CTA: "${c}" in accent color button or bold text`:''}${p?`\nFOOTER: phone "${p}" in small clean type`:''}${e?`\nFOOTER: email "${e}" in small clean type`:''}${w?`\nFOOTER: website or handle "${w}" in small clean type`:''}\nAll text must be 100% legible and accurate. Style: ${vi.chatgpt_directive}. Colors: ${colors}. Vertical 9:16, print quality.`;
+  }
+  if(platList.includes('canva')){
+    out.canva=`${vi.canva_style} flyer for "${headline}"${dateStr?` on ${dateStr}`:''}${ve?` at ${ve}`:''}${p?` · Phone ${p}`:''}${e?` · Email ${e}`:''}${w?` · ${w}`:''}. Colors: ${colors}.`;
+  }
+  if(platList.includes('ideogram')){
+    out.ideogram=`${vi.visual.split(',')[0]}, bold headline text "${headline}"${s?`, subtitle "${s}"`:''}${dateStr?`, date "${dateStr}"`:''}${p?`, phone "${p}"`:''}${e?`, email "${e}"`:''}${w?`, website "${w}"`:''}. Colors: ${colors}. [${vi.ideogram_style}]`;
+  }
+  if(platList.includes('firefly')){
+    out.firefly=`${vi.firefly_style} poster design. ${vi.visual}. Mood: ${cat==='event'?'celebratory and exciting':cat==='business'?'professional and trustworthy':'bold and distinctive'}. Colors: ${colors}. Dramatic ${vi.visual.includes('spotlight')?'spotlight':'studio'} lighting.`;
+  }
+  if(platList.includes('leonardo')){
+    out.leonardo=`${vi.visual.split(',')[0]}, bold headline text "${headline}"${dateStr?`, date text "${dateStr}"`:''}${p?`, phone text "${p}"`:''}${e?`, email text "${e}"`:''}${w?`, website text "${w}"`:''}. Style: ${vi.leonardo_style}. Colors: ${colors}. Ultra sharp focus, poster quality.`;
+  }
+
+  out.tips=[
+    `${vibe==='midjourney'||platList.includes('midjourney')?'After generating, upscale your best result (U1–U4) then use Vary (Subtle) — not Strong — to keep the text layout while refining details':'For text accuracy in any AI tool: generate the visual background first, then use Canva or Figma to add your exact text on top'}`,
+    `${cat==='event'?'Event flyers perform 3x better on social when the DATE is the second-largest text element — make sure your prompt specifies date text size explicitly':cat==='business'?'For business flyers going to print: always regenerate at full resolution and check text clarity before printing':'For creator flyers: generate 4 variations then A/B test which one gets more saves — saves predict reach better than likes'}`,
+    `Ideogram.ai is currently the most accurate AI tool for flyer text rendering — if your headline needs to be exactly right, use the Ideogram prompt first`
+  ];
+  return out;
+}
+
+const PLAT_CONFIG={
+  midjourney:{icon:'🎨',name:'Midjourney',how:'Discord → /imagine → paste prompt'},
+  chatgpt:{icon:'⚡',name:'ChatGPT Image',how:'GPT-4o → Image tab → paste prompt'},
+  canva:{icon:'🖌️',name:'Canva AI',how:'Canva → Magic Design → paste prompt'},
+  ideogram:{icon:'🔤',name:'Ideogram',how:'ideogram.ai → Generate → paste prompt'},
+  firefly:{icon:'🔥',name:'Adobe Firefly',how:'firefly.adobe.com → Generate → paste'},
+  leonardo:{icon:'🦁',name:'Leonardo AI',how:'leonardo.ai → Image Gen → paste prompt'}
+};
+
+function renderResult(data, catLabel, headline){
+  // Tags
+  const viLabel=VIBES[vibe]?.label||vibe;
+  document.getElementById('rtags').innerHTML=`
+    <div class="rtag rtag-g">${catLabel}</div>
+    <div class="rtag rtag-b">${viLabel}</div>
+    <div class="rtag rtag-a">${[...platforms].map(p=>PLAT_CONFIG[p].name).join(' · ')}</div>
+  `;
+
+  let html='';
+
+  // Platform blocks
+  [...platforms].forEach(p=>{
+    if(!data[p]) return;
+    const pc=PLAT_CONFIG[p];
+    html+=`
+      <div class="pb">
+        <div class="pb-head">
+          <div class="pb-left">
+            <div class="pb-ico">${pc.icon}</div>
+            <div>
+              <div class="pb-name">${pc.name}</div>
+              <div class="pb-how">${pc.how}</div>
+            </div>
+          </div>
+          <button class="cpbtn" data-platform="${p}" onclick="copyBlock(this,'${p}')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copy
+          </button>
+        </div>
+        <div class="pb-text" id="pt-${p}">${escapeHtml(data[p])}</div>
+      </div>
+    `;
+  });
+
+  // Tips
+  if(data.tips&&data.tips.length){
+    html+=`
+      <div class="tips">
+        <div class="tips-head">
+          <div class="tips-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+          <div class="tips-t">Pro Tips for This Combo</div>
+        </div>
+        ${data.tips.map((t,i)=>`<div class="tip"><div class="tip-n">${i+1}</div><div>${t}</div></div>`).join('')}
+      </div>
+    `;
+  }
+
+  document.getElementById('resultBody').innerHTML=html;
+  document.getElementById('resultState').classList.add('show');
+}
+
+function copyBlock(btn, platform){
+  const text=stored[platform];
+  if(!text) return;
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.classList.add('done');
+    btn.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="10" height="10"><polyline points="20 6 9 17 4 12"/></svg> Copied`;
+    toast(`${PLAT_CONFIG[platform].name} prompt copied!`);
+    setTimeout(()=>{
+      btn.classList.remove('done');
+      btn.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="10" height="10"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy`;
+    },2200);
+  });
+}
+
+function reset(){
+  document.querySelectorAll('.cat-btn,.vibe-btn').forEach(b=>b.classList.remove('active'));
+  cat=null; vibe=null;
+  ['fHeadline','fSub','fDate','fTime','fVenue','fCta','fPhone','fEmail','fHandle','fColors','fExtra'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('resultState').classList.remove('show');
+  document.getElementById('loadingState').classList.remove('show');
+  document.getElementById('emptyState').style.display='flex';
+  stored={};
+}
+
+function tgShare(){
+  const h=gv('fHeadline')||'my flyer';
+  const u=encodeURIComponent(window.location.href);
+  const t=encodeURIComponent(`Just built AI prompts for a "${h}" flyer using Flyer Factory 🔥\n\nFree tool 👇`);
+  window.open(`https://t.me/share/url?url=${u}&text=${t}`,'_blank');
+}
+
+function toast(msg){
+  const el=document.getElementById('toast');
+  document.getElementById('tMsg').textContent=msg;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2400);
+}
+
+function escapeHtml(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+</script>
+</body>
+</html>
